@@ -204,9 +204,9 @@ cython_debug/
 # Marimo
 marimo/_static/
 marimo/_lsp/
+__marimo__/
 
 # .dll files
 # Im removing all the dll files from the project as i cant upload them to githud due to the limit of each folder being 100 mb
 # Therefore the user will have to download them and put them into the executable folder
 *.dll
-__marimo__/
