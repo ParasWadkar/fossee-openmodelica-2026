@@ -210,3 +210,8 @@ __marimo__/
 # Im removing all the dll files from the project as i cant upload them to githud due to the limit of each folder being 100 mb
 # Therefore the user will have to download them and put them into the executable folder
 *.dll
+
+# Exclude large OpenModelica runtime executables
+OMEdit.exe
+omc.exe
+omplot.exe
