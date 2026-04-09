@@ -2,16 +2,13 @@
 
 A desktop GUI application built with **Python + PyQt6** to launch OpenModelica-compiled simulation executables with configurable start and stop times.
 
-Built as part of the **FOSSEE Summer Fellowship 2026** screening task.
+Built as part of the **FOSSEE Summer Fellowship 2026** screening task — OpenModelica project.
 
 ---
 
-## Screenshot
+## Demo
 
-> Run the app and you'll see a dark-themed terminal-style interface with:
-> - Executable browser
-> - Start/Stop time inputs with built-in validation
-> - Live simulation output console
+![App Screenshot](screenshot.png)
 
 ---
 
@@ -19,28 +16,31 @@ Built as part of the **FOSSEE Summer Fellowship 2026** screening task.
 
 - Browse and select any OpenModelica-compiled `.exe`
 - Set start and stop time with enforced constraint: `0 ≤ start < stop < 5`
-- Runs simulation in a **background thread** — GUI stays responsive
-- Live output streaming to the console
-- Error dialogs for invalid inputs or missing files
+- Runs simulation in a **background thread** — GUI stays responsive during execution
+- Live output streaming to a terminal-style console
+- Input validation with descriptive error dialogs
+- Status bar feedback throughout execution
 
 ---
 
 ## Project Structure
 
 ```
-OpenModelicaApp/
+fossee-openmodelica-2026/
 │
 ├── gui/
-│   └── app.py               # Main PyQt6 application
+│   └── app.py                        # Main PyQt6 application
 │
-├── executable/
-│   ├── TwoConnectedTanks.exe
-│   ├── TwoConnectedTanks.bat
-│   ├── TwoConnectedTanks_init.xml
-│   ├── TwoConnectedTanks_info.json
-│   ├── TwoConnectedTanks_JacA.bin
-│   ├── TwoConnectedTanks_res.mat
-│   └── TwoConnectedTanks.log
+├── OpenModelicaApp/
+│   └── executable/
+│       ├── TwoConnectedTanks.exe     # Compiled OpenModelica model
+│       ├── TwoConnectedTanks.bat     # Batch runner script
+│       ├── TwoConnectedTanks_init.xml
+│       ├── TwoConnectedTanks_info.json
+│       ├── TwoConnectedTanks_JacA.bin
+│       ├── TwoConnectedTanks_prof.intdata
+│       ├── TwoConnectedTanks_prof.realdata
+│       └── TwoConnectedTanks_res.mat
 │
 └── README.md
 ```
@@ -51,15 +51,38 @@ OpenModelicaApp/
 
 - Python 3.6+
 - PyQt6
-- OpenModelica 1.26.3 (for compiling the model)
+- OpenModelica 1.26.3 (Windows 64-bit)
 - Windows 10/11
 
 ---
 
 ## Installation
 
+### 1. Install Python dependencies
+
 ```bash
 pip install PyQt6
+```
+
+### 2. Install OpenModelica
+
+Download and install **OpenModelica 1.26.3 (64-bit)** from the official website:
+https://openmodelica.org/download/download-windows/
+
+### 3. Copy required DLL files
+
+The simulation executable depends on runtime DLL libraries that ship with OpenModelica. Since these files exceed GitHub's file size limits, they are not included in this repository and must be copied manually.
+
+After installing OpenModelica, run the following command in **Command Prompt**:
+
+```
+copy "C:\Program Files\OpenModelica1.26.3-64bit\bin\*" "<path-to-repo>\OpenModelicaApp\executable\"
+```
+
+Replace `<path-to-repo>` with the path where you cloned this repository. For example:
+
+```
+copy "C:\Program Files\OpenModelica1.26.3-64bit\bin\*" "C:\Users\YourName\fossee-openmodelica-2026\OpenModelicaApp\executable\"
 ```
 
 ---
@@ -71,7 +94,7 @@ cd gui
 python app.py
 ```
 
-1. Click **Browse** and navigate to `executable/TwoConnectedTanks.exe`
+1. Click **Browse** and navigate to `OpenModelicaApp/executable/TwoConnectedTanks.exe`
 2. Set **Start Time** (0–3) and **Stop Time** (1–4), ensuring `start < stop < 5`
 3. Click **▶ Run Simulation**
 4. View live output in the console panel
@@ -80,21 +103,39 @@ python app.py
 
 ## Model: TwoConnectedTanks
 
-The `TwoConnectedTanks` model is part of the `NonInteractingTanks` package. It simulates fluid dynamics between two connected tanks. The model was compiled using **OMEdit** (OpenModelica Connection Editor) v1.26.3.
+The `TwoConnectedTanks` model is part of the `NonInteractingTanks` package provided by FOSSEE. It simulates fluid flow dynamics between two connected tanks with different initial liquid levels.
 
-The executable accepts simulation flags via the `-override` argument:
+The model was compiled using **OMEdit** (OpenModelica Connection Editor) v1.26.3 on Windows 11.
+
+The executable accepts simulation parameters via the `-override` flag:
 
 ```bash
 TwoConnectedTanks.exe -override=startTime=0,stopTime=4
 ```
 
-Reference: [OpenModelica Simulation Flags](https://openmodelica.org/doc/OpenModelicaUsersGuide/latest/simulationflags.html#simflag-override)
+Reference: [OpenModelica Simulation Flags Documentation](https://openmodelica.org/doc/OpenModelicaUsersGuide/latest/simulationflags.html#simflag-override)
 
 ---
 
 ## Design Decisions
 
-- **OOP structure**: Logic split into `SimulationRunner` (main window) and `SimulationWorker` (QThread) — keeps UI and simulation concerns separate
-- **Background thread**: Simulation runs in `QThread` so the GUI never freezes
-- **Input validation**: All edge cases caught before execution (missing file, bad time range)
-- **PEP8 compliant**: Follows Python style guidelines throughout
+**Two-class OOP structure:**
+- `SimulationRunner` — manages the entire GUI (window, widgets, layout, user interaction)
+- `SimulationWorker` — handles execution of the simulation in a separate `QThread`
+
+Separating these two concerns means UI logic and execution logic never interfere with each other, making the code easier to maintain and extend.
+
+**Why QThread?**
+Without threading, running the executable would block the main GUI thread — the window would freeze until the simulation completes. Running it in a `QThread` keeps the interface fully responsive and allows output to stream in live via `pyqtSignal`.
+
+**Input validation:**
+All edge cases are caught before execution — missing file, non-existent path, and invalid time range — with descriptive error dialogs so the user always knows what went wrong.
+
+---
+
+## Author
+
+Paras Pitu Wadkar
+24BCE10421
+VIT Bhopal University
+FOSSEE Summer Fellowship 2026 Applicant
