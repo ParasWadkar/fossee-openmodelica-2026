@@ -8,7 +8,7 @@ Built as part of the **FOSSEE Summer Fellowship 2026** screening task — OpenMo
 
 ## Demo
 
-![App Screenshot](screenshot.png)
+![Demo Screenshot.png](Demo.png)
 
 ---
 
@@ -17,32 +17,23 @@ Built as part of the **FOSSEE Summer Fellowship 2026** screening task — OpenMo
 - Browse and select any OpenModelica-compiled `.exe`
 - Set start and stop time with enforced constraint: `0 ≤ start < stop < 5`
 - Runs simulation in a **background thread** — GUI stays responsive during execution
+- Passes simulation parameters correctly using runtime flags (-startTime, -stopTime)
 - Live output streaming to a terminal-style console
-- Input validation with descriptive error dialogs
-- Status bar feedback throughout execution
+- Input validation with clear and descriptive error dialogs 
+- Status bar feedback throughout execution (Ready → Running → Completed/Failed)
+- Graceful handling of execution errors (invalid path, permission issues, runtime failures)
 
 ---
 
 ## Project Structure
 
 ```
-fossee-openmodelica-2026/
-│
-├── gui/
-│   └── app.py                        # Main PyQt6 application
-│
-├── OpenModelicaApp/
-│   └── executable/
-│       ├── TwoConnectedTanks.exe     # Compiled OpenModelica model
-│       ├── TwoConnectedTanks.bat     # Batch runner script
-│       ├── TwoConnectedTanks_init.xml
-│       ├── TwoConnectedTanks_info.json
-│       ├── TwoConnectedTanks_JacA.bin
-│       ├── TwoConnectedTanks_prof.intdata
-│       ├── TwoConnectedTanks_prof.realdata
-│       └── TwoConnectedTanks_res.mat
-│
-└── README.md
+fossee-openmodelica-2026/ 
+├── executable/     # Compiled OpenModelica executable 
+├── gui/            # PyQt6 GUI application 
+├── README.md 
+├── LICENSE 
+└── .gitignore
 ```
 
 ---
@@ -107,10 +98,10 @@ The `TwoConnectedTanks` model is part of the `NonInteractingTanks` package provi
 
 The model was compiled using **OMEdit** (OpenModelica Connection Editor) v1.26.3 on Windows 11.
 
-The executable accepts simulation parameters via the `-override` flag:
+The executable accepts simulation parameters using dedicated runtime flags:
 
 ```bash
-TwoConnectedTanks.exe -override=startTime=0,stopTime=4
+TwoConnectedTanks.exe -startTime=0 -stopTime=4
 ```
 
 Reference: [OpenModelica Simulation Flags Documentation](https://openmodelica.org/doc/OpenModelicaUsersGuide/latest/simulationflags.html#simflag-override)
