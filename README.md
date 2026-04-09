@@ -126,7 +126,7 @@ All edge cases are caught before execution — missing file, non-existent path, 
 
 ## Author
 
-Paras Pitu Wadkar
-24BCE10421
-VIT Bhopal University
+**Paras Pitu Wadkar**  
+VIT Bhopal University  
+Roll No: 24BCE10421  
 FOSSEE Summer Fellowship 2026 Applicant
